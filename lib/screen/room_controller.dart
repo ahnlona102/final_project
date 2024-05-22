@@ -12,6 +12,7 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 
 import '../model/mqtt_model.dart';
 
+
 class RoomController extends StatefulWidget {
   const RoomController({super.key, required this.roomData});
   final SmartHomeModel roomData;
@@ -25,7 +26,7 @@ class _RoomControllerState extends State<RoomController> {
   ValueNotifier<bool> _isConnectMQTTNotifier = ValueNotifier(false);
   MqttServerClient? client = clientMQTT.client;
   final String serverUri = 'broker.emqx.io';
-  final String clientId = 'mqttx_da09bbc2';
+  final String clientId = 'mqttx_583f73ca';
   final String topic = 'ESP32/DHT11/Data';
 
   @override

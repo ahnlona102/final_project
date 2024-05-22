@@ -26,62 +26,95 @@ class _DeviceSwitchState extends State<DeviceSwitch> {
   MqttServerClient? client;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     setState(() {
       data = this.widget.data;
       client = this.widget.client;
     });
-    if(data.deviceName == 'Light'){
-      if (client?.connectionStatus!.state == MqttConnectionState.connected) {
-        print("MQTT client connected");
-        client?.updates?.listen((List<MqttReceivedMessage<MqttMessage? >> ? c) {
-            final recMess = c![0].payload as MqttPublishMessage;
-            final pt =
-            MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-            print('topic 123 ${c[0].topic}');
-            print('pt ${pt}');
-            if(c[0].topic == data.topicLight){
-              statusLightNotifier.value = pt == 'true';
-                  setState(() {
-                    data.deviceStatus = pt == 'true';
-                  });
-            }else{
-              print('WRONG TOPIC!!!');
-            }
-          });
-        // client?.published!.listen((MqttPublishMessage message) {
-        //   if (message.variableHeader!.topicName == data.topicLight) {
-        //     print('message: ${message.payload.message.toString()}');
-        //     setState(() {
-        //       data.deviceStatus = !data.deviceStatus;
-        //     });
-        //     print('value:${message}');
-        //   }
-        // });
-      }
-    }
-    if(data.deviceName == 'Fan'){
-      if (client?.connectionStatus?.state == MqttConnectionState.connected) {
-        print("MQTT client connected for Fan");
-        client?.updates?.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
-          for (final message in c!) {
-            final recMess = message.payload as MqttPublishMessage;
-            final ft = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-            print('topic: ${message.topic}');
-            print('ft: $ft');
-            if (message.topic == data.topicRelay) {
-              statusRelayNotifier.value = ft == 'true';
-              setState(() {
-                data.deviceStatus = ft == 'true';
-              });
-            } else {
-              print('WRONG TOPIC!!!');
-            }
+
+    if (client?.connectionStatus?.state == MqttConnectionState.connected) {
+      print("MQTT client connected");
+      client?.updates?.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
+        for (final message in c!) {
+          final recMess = message.payload as MqttPublishMessage;
+          final pt = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+          print('topic: ${message.topic}');
+          print('pt: $pt');
+          if (message.topic == data.topicLight) {
+            statusLightNotifier.value = pt == 'true';
+            setState(() {
+              data.deviceStatus = pt == 'true';
+            });
+          } else if (message.topic == data.topicRelay) {
+            statusRelayNotifier.value = pt == 'true';
+            setState(() {
+              data.deviceStatus = pt == 'true';
+            });
+          } else {
+            print('WRONG TOPIC!!!');
           }
-        });
-      }
+        }
+      });
     }
+  }
+
+// void initState(){
+  //   super.initState();
+  //   setState(() {
+  //     data = this.widget.data;
+  //     client = this.widget.client;
+  //   });
+  //   if(data.deviceName == 'Light'){
+  //     if (client?.connectionStatus!.state == MqttConnectionState.connected) {
+  //       print("MQTT client connected");
+  //       client?.updates?.listen((List<MqttReceivedMessage<MqttMessage? >> ? c) {
+  //           final recMess = c![0].payload as MqttPublishMessage;
+  //           final pt =
+  //           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+  //           print('topic 123 ${c[0].topic}');
+  //           print('pt ${pt}');
+  //           if(c[0].topic == data.topicLight){
+  //             statusLightNotifier.value = pt == 'true';
+  //                 setState(() {
+  //                   data.deviceStatus = pt == 'true';
+  //                 });
+  //           }else{
+  //             print('WRONG TOPIC!!!');
+  //           }
+  //         });
+  //       // client?.published!.listen((MqttPublishMessage message) {
+  //       //   if (message.variableHeader!.topicName == data.topicLight) {
+  //       //     print('message: ${message.payload.message.toString()}');
+  //       //     setState(() {
+  //       //       data.deviceStatus = !data.deviceStatus;
+  //       //     });
+  //       //     print('value:${message}');
+  //       //   }
+  //       // });
+  //     }
+  //   }
+  //   if(data.deviceName == 'Fan'){
+  //     if (client?.connectionStatus?.state == MqttConnectionState.connected) {
+  //       print("MQTT client connected for Fan");
+  //       client?.updates?.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
+  //         for (final message in c!) {
+  //           final recMess = message.payload as MqttPublishMessage;
+  //           final ft = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+  //           print('topic: ${message.topic}');
+  //           print('ft: $ft');
+  //           if (message.topic == data.topicRelay) {
+  //             statusRelayNotifier.value = ft == 'true';
+  //             setState(() {
+  //               data.deviceStatus = ft == 'true';
+  //             });
+  //           } else {
+  //             print('WRONG TOPIC!!!');
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }
 
     // client?.published!.listen((MqttPublishMessage message) {
         //   if (message.variableHeader!.topicName == data.topicLight) {
@@ -92,7 +125,7 @@ class _DeviceSwitchState extends State<DeviceSwitch> {
         //     print('value:${message}');
         //   }
         // });
-      }
+      //}
       // xu ly' o day
 
   void onPressed() {
@@ -100,7 +133,7 @@ class _DeviceSwitchState extends State<DeviceSwitch> {
       print(data.topicLight);
       print(client?.connectionStatus!.state);
       if (client?.connectionStatus!.state == MqttConnectionState.connected){
-        print('onpress light');
+        print('Light button pressed');
         final builder1 = MqttClientPayloadBuilder();
         builder1.addString('${!data.deviceStatus}');
         client?.publishMessage(data.topicLight!, MqttQos.atLeastOnce, builder1.payload!);
@@ -111,22 +144,47 @@ class _DeviceSwitchState extends State<DeviceSwitch> {
       });
     }
   }
+
+  // void onFanPressed() {
+  //   if (data.deviceName == 'Fan') {
+  //     print('Fan button pressed');
+  //     print('Topic: ${data.topicRelay}');
+  //     print('Client state: ${client?.connectionStatus?.state}');
+  //     if (client?.connectionStatus?.state == MqttConnectionState.connected) {
+  //       print('MQTT client connected for fan');
+  //       final builder = MqttClientPayloadBuilder();
+  //       builder.addString('${!data.deviceStatus}');
+  //       client?.publishMessage(data.topicRelay!, MqttQos.atLeastOnce, builder.payload!);
+  //     } else {
+  //       print('MQTT client is not connected');
+  //     }
+  //     setState(() {
+  //       data.deviceStatus = !data.deviceStatus;
+  //     });
+  //   }
+  // }
   void onFanPressed() {
-    if(data.deviceName == 'Fan'){
-      print(data.topicRelay);
-      print(client?.connectionStatus!.state);
-      if (client?.connectionStatus!.state == MqttConnectionState.connected){
-        print('onpress fan');
-        final builder2 = MqttClientPayloadBuilder();
-        builder2.addString('${!data.deviceStatus}');
-        client?.publishMessage(data.topicRelay!, MqttQos.atLeastOnce, builder2.payload!);
+    print('Fan button pressed');
+    print('Topic: ${data.topicRelay}');
+    print('Client state: ${client?.connectionStatus?.state}');
+
+    if (data.deviceName == 'Fan') {
+      if (client?.connectionStatus?.state == MqttConnectionState.connected) {
+        print('MQTT client connected for fan');
+        final builder = MqttClientPayloadBuilder();
+        // Toggle the status
+        builder.addString('${!data.deviceStatus}');
+        client?.publishMessage(data.topicRelay!, MqttQos.atLeastOnce, builder.payload!);
+      } else {
+        print('MQTT client is not connected');
       }
-    } else {
-      setState(() {
-        data.deviceStatus = !data.deviceStatus;
-      });
     }
+    setState(() {
+      data.deviceStatus = !data.deviceStatus;
+    });
   }
+
+
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,3 @@
-
-
 import 'package:IntelliHome/model/smart_home_model.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
@@ -13,7 +11,7 @@ void connectMQTT(Function success, Function failed){
 class ClientMQTT {
   ClientMQTT();
   final String serverUri = 'broker.emqx.io';
-  final String clientId = 'mqttx_da0d8bc2';
+  final String clientId = 'mqttx_583f73ca';
   final String topic = 'ESP32/DHT11/Data';
   MqttServerClient? client;
 
